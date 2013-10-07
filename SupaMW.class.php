@@ -60,6 +60,7 @@ class SupaMW {
         if ( $limit2 > 0 && $limit2 < $limit3 ) {
             $limit3 = $limit2;
         }
+        $radio = true;
         $descriptor['UploadFileSUPA'] = array(
             'class' => 'SUPAField',
             'section' => 'source',
