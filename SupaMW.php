@@ -27,7 +27,7 @@
 // This extension adds an extra "Clipboard" option to the normal file upload page,
 // so you can upload images to MediaWiki directly from the clipboard.
 // SUPA applet is used for that (http://supa.sourceforge.net/)
-// REQUIREMENTS: PHP 5, MediaWiki 1.16, Java on client machines.
+// REQUIREMENTS: PHP 5, MediaWiki 1.17, Java on client machines.
 // INSTALLATION:
 // 1) Make sure that you either don't have PHP Suhosin extension installed,
 //    or that suhosin.post.max_value_length AND suhosin.request.max_value_length
@@ -37,7 +37,9 @@
 //    This is required because SUPA images are uploaded not as "file" parts, but as
 //    "normal" POST values. This is a sort of the hack, but other ways to integrate
 //    SUPA with normal MediaWiki file upload form are much more tricky.
-// 2) Put the following into your LocalSettings.php:
+// 2) If you install SupaMW on MediaWiki 1.24 or later, modify includes/upload/UploadBase.php
+//    by changing 'private static $uploadHandlers' to 'public static $uploadHandlers'.
+// 3) Put the following into your LocalSettings.php:
 //    require_once "$IP/extensions/SupaMW/SupaMW.php";
 
 $dir = dirname(__FILE__) . '/';
@@ -51,8 +53,19 @@ $wgHooks['UploadCreateFromRequest'][] = 'SupaMW::addHandler';
 $wgExtensionCredits['other'][] = array(
     'path'        => __FILE__,
     'name'        => 'SupaMW',
-    'version'     => '2012-10-12',
+    'version'     => '2015-10-16',
     'author'      => 'Vitaliy Filippov',
     'url'         => 'http://wiki.4intra.net/SupaMW',
     'description' => 'SUPA java applet support for pasting images from clipboard directly into MediaWiki',
+);
+
+$wgResourceModules['ext.SupaMW'] = array(
+    'localBasePath' => __DIR__,
+    'remoteExtPath' => 'SupaMW',
+    'scripts' => [ 'SupaMW.js' ],
+    'messages' => [
+        'supa-java-disabled',
+        'supa-needs-java',
+        'supa-paste-again',
+    ],
 );

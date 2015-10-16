@@ -102,82 +102,9 @@ class SUPAField extends HTMLTextField {
         return Html::rawElement( 'td', array( 'class' => 'mw-label' ), $label );
     }
     function getInputHTML( $value ) {
-        global $wgScriptPath, $wgOut;
-        $applet =
-'<a href="javascript:void(0)" onclick="supaPasteAgain()">'.wfMsg( 'supa-paste-again' ).'</a><br />
-<applet id="SupaApplet" archive="'.$wgScriptPath.'/extensions/SupaMW/Supa.jar"
-    code="de.christophlinder.supa.SupaApplet" width="400" height="300"
-    style="border: 3px solid #ddd">
-    <param name="trace" value="true" />
-    <param name="pasteonload" value="true" />
-    <param name="clickforpaste" value="true" />
-    <param name="imagecodec" value="png" />
-    <param name="encoding" value="base64" />
-    <param name="previewscaler" value="fit to canvas" />
-    '.wfMsgExt( 'supa-needs-java', 'parseinline' ).'
-</applet>';
-        $applet = str_replace( "\n", "\\n", addslashes( $applet ) );
-        $javaDisabled = wfMsg( 'supa-java-disabled' );
-        $emptyContent = wfMsg( 'supa-empty-content' );
-        $wgOut->addScript( <<<EOF
-<script language="JavaScript" type="text/javascript"><!--
-if ( navigator.javaEnabled() ) {
-    window.supaPostApplet = function() {
-        document.getElementById( 'mw-supa-placeholder' ).innerHTML = '$applet';
-        var d = document.getElementById( 'wpDestFile' );
-        var s = d.value;
-        var p = s.lastIndexOf( '.' );
-        if ( p > -1 ) {
-            s = s.substr( 0, p );
-        }
-        d.value = s + '.png';
-        return true;
-    };
-    addHandler( document.getElementById( 'wpSourceTypeSupa' ), 'change', supaPostApplet );
-    addHandler( window, 'load', function() {
-        document.getElementById( 'wpSourceTypeSupa' ).disabled = false;
-        if ( document.getElementById( 'wpSourceTypeSupa' ).checked ) {
-            // Workaround Firefox's form value restoring
-            supaPostApplet();
-        }
-        return true;
-    });
-    document.getElementById( 'mw-upload-form' ).onsubmit = function() {
-        var e = document.getElementById( 'wpSourceTypeSupa' );
-        if ( e && e.checked ) {
-            var s;
-            try {
-                s = document.getElementById( 'SupaApplet' ).getEncodedString();
-            } catch( e ) {
-                supaError();
-                return false;
-            }
-            if ( !s ) {
-                alert( '$emptyContent' );
-                return false;
-            }
-            document.getElementById( 'wpSupaContent' ).value = s;
-        }
-        return true;
-    };
-    window.supaError = function() {
-        alert( '$javaDisabled' );
-        document.getElementById( 'mw-supa-placeholder' ).innerHTML = '$javaDisabled';
-        document.getElementById( 'wpSourceTypeFile' ).checked = true;
-        document.getElementById( 'wpSourceTypeSupa' ).disabled = true;
-    };
-    window.supaPasteAgain = function() {
-        try {
-            document.getElementById( 'SupaApplet' ).pasteFromClipboard();
-        } catch( e ) {
-            supaError();
-        }
-    };
-}
-//--></script>
-EOF
-);
+        global $wgOut;
+        $wgOut->addModules( 'ext.SupaMW' );
         return '<input type="hidden" name="wpSupaContent" id="wpSupaContent" value="" />
-<div id="mw-supa-placeholder"><div id="wpUploadFileSUPA"></div>'.wfMsgExt( 'supa-needs-java', 'parseinline' ).'</div>';
+<div id="mw-supa-placeholder"><div id="wpUploadFileSUPA"></div>'.wfMsgNoTrans( 'supa-needs-java' ).'</div>';
     }
 }
